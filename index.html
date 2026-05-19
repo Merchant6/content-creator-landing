@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="PromptEdit helps creators build better videos faster with guided workflows, production-ready assets, and marketplace tools."
+    />
+    <title>PromptEdit | Creator marketplace and video workflow tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: "#11110f",
+              bone: "#f7f4ee",
+              paper: "#fffaf1",
+              ember: "#ff5c35",
+              mint: "#3abf96",
+              citrus: "#e8b73f",
+              steel: "#667085"
+            },
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
+            },
+            boxShadow: {
+              soft: "0 24px 70px rgba(17,17,15,.14)",
+              lift: "0 18px 44px rgba(17,17,15,.12)"
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      @import url("https://rsms.me/inter/inter.css");
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #f7f4ee;
+      }
+
+      .texture {
+        background-image:
+          linear-gradient(rgba(17, 17, 15, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(17, 17, 15, 0.04) 1px, transparent 1px);
+        background-size: 42px 42px;
+      }
+
+      .hero-media {
+        background:
+          linear-gradient(145deg, rgba(17, 17, 15, 0.94), rgba(41, 35, 29, 0.96)),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+          linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: auto, 34px 34px, 34px 34px;
+      }
+
+      .timeline-bar {
+        background-image: repeating-linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.88) 0 16px,
+          rgba(255, 255, 255, 0.3) 16px 22px
+        );
+      }
+
+      .focus-ring:focus-visible {
+        outline: 3px solid #44d7a8;
+        outline-offset: 4px;
+      }
+
+      #intro-modal > div {
+        animation: modal-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+
+      .hero-media {
+        animation: hero-float 8s ease-in-out infinite;
+        overflow: hidden;
+      }
+
+      .hero-media::after {
+        background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.14) 46%, transparent 62%);
+        content: "";
+        inset: -35%;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        transform: translateX(-28%) rotate(12deg);
+        transition: opacity 260ms ease, transform 760ms ease;
+      }
+
+      .hero-media:hover::after {
+        opacity: 1;
+        transform: translateX(28%) rotate(12deg);
+      }
+
+      .timeline-bar {
+        animation: timeline-drift 18s linear infinite;
+        background-size: 44px 100%;
+      }
+
+      a,
+      button,
+      article,
+      .hero-media,
+      .rounded-lg {
+        transition-duration: 220ms;
+        transition-property: background-color, border-color, box-shadow, color, opacity, transform;
+        transition-timing-function: ease;
+      }
+
+      a:hover,
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      article:hover {
+        box-shadow: 0 18px 42px rgba(17, 17, 15, 0.1);
+        transform: translateY(-4px);
+      }
+
+      .hero-media:hover {
+        transform: translateY(-3px);
+      }
+
+      .motion-ready .reveal {
+        opacity: 0;
+        transform: translateY(22px);
+        transition: opacity 620ms ease, transform 620ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition-delay: var(--stagger-delay, 0ms);
+      }
+
+      .motion-ready .reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .motion-ready .reveal-stagger > * {
+        transition-delay: var(--stagger-delay, 0ms);
+      }
+
+      @keyframes modal-in {
+        from {
+          opacity: 0;
+          transform: translateY(12px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes hero-float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      @keyframes timeline-drift {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: 440px 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 1ms !important;
+        }
+
+        a:hover,
+        button:hover,
+        article:hover,
+        .hero-media,
+        .hero-media:hover {
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="font-sans text-ink antialiased">
+    <div
+      id="intro-modal"
+      class="fixed inset-0 z-[100] grid place-items-center bg-ink/75 px-4 py-6 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="intro-modal-title"
+      aria-describedby="intro-modal-copy"
+    >
+      <div class="w-full max-w-xl rounded-lg bg-paper p-5 shadow-soft sm:p-7">
+        <div class="flex items-start justify-between gap-5">
+          <div>
+            <p class="text-sm font-black uppercase tracking-[.18em] text-ember">Quick note</p>
+            <h2 id="intro-modal-title" class="mt-3 text-3xl font-black leading-tight sm:text-4xl">Before you review the page</h2>
+          </div>
+          <button
+            type="button"
+            class="focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-full border border-ink/10 bg-bone text-xl font-black text-ink transition hover:border-ink/30"
+            data-close-modal
+            aria-label="Close message"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div id="intro-modal-copy" class="mt-5 space-y-4 text-base leading-7 text-ink/70">
+          <p>
+            Here is my request: consider me for a <strong class="font-black text-ink">broader full-stack role</strong>, not only front-end.
+          </p>
+          <p>
+            I built this page to show <strong class="font-black text-ink">design taste</strong>, <strong class="font-black text-ink">responsive UI judgment</strong>, and <strong class="font-black text-ink">creator-focused product thinking</strong>. I can also help ContentCreator.com with <strong class="font-black text-ink">Laravel/Vue features</strong>, backend workflows, APIs, databases, tool integrations, and marketplace systems.
+          </p>
+          <p class="font-bold text-ink">
+            I can design the experience, build the product, and connect the systems behind it.
+          </p>
+        </div>
+
+        <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            class="focus-ring inline-flex min-h-12 items-center justify-center rounded-full bg-ember px-6 text-base font-black text-white transition hover:bg-ink"
+            data-close-modal
+          >
+            Review the page
+          </button>
+          <a
+            href="https://merchant6.github.io/portfolio/"
+            class="focus-ring inline-flex min-h-12 items-center justify-center rounded-full border border-ink/15 bg-bone px-6 text-base font-bold text-ink transition hover:border-ink/30"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            See what I built
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <header class="sticky top-0 z-50 border-b border-ink/10 bg-bone/90 backdrop-blur">
+      <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8" aria-label="Primary navigation">
+        <a href="#" class="focus-ring flex items-center gap-3 rounded-sm" aria-label="PromptEdit home">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-ink text-sm font-black text-bone">PE</span>
+          <span class="text-base font-bold tracking-tight">PromptEdit</span>
+        </a>
+
+        <div class="hidden items-center gap-8 text-sm font-medium text-ink/70 md:flex">
+          <a class="focus-ring rounded-sm hover:text-ink" href="#workflow">Workflow</a>
+          <a class="focus-ring rounded-sm hover:text-ink" href="#marketplace">Marketplace</a>
+          <a class="focus-ring rounded-sm hover:text-ink" href="#how">How it works</a>
+          <a class="focus-ring rounded-sm hover:text-ink" href="#outcomes">Outcomes</a>
+        </div>
+
+        <a
+          href="#join"
+          class="focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-5 text-sm font-bold text-bone transition hover:bg-ember"
+        >
+          Join the marketplace
+        </a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="texture overflow-hidden">
+        <div class="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1fr_.96fr] lg:items-center lg:px-8 lg:py-24">
+          <div class="max-w-3xl">
+            <p class="mb-5 inline-flex rounded-full border border-ink/10 bg-paper px-4 py-2 text-sm font-bold text-ink/75 shadow-sm">
+              Creator-ready assets with practical production workflows
+            </p>
+            <h1 class="max-w-4xl text-5xl font-black leading-[.95] tracking-normal text-ink sm:text-6xl lg:text-7xl">
+              Create better videos faster.
+            </h1>
+            <p class="mt-6 max-w-2xl text-lg leading-8 text-ink/70 sm:text-xl">
+              PromptEdit brings templates, prompts, video tools, and production-ready creator packs into one focused marketplace for editors, agencies, and short-form teams.
+            </p>
+
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="#join"
+                class="focus-ring inline-flex min-h-12 items-center justify-center rounded-full bg-ember px-6 text-base font-black text-white shadow-lift transition hover:bg-ink"
+              >
+                Join the marketplace
+              </a>
+              <a
+                href="#workflow"
+                class="focus-ring inline-flex min-h-12 items-center justify-center rounded-full border border-ink/15 bg-paper px-6 text-base font-bold text-ink transition hover:border-ink/30"
+              >
+                See the workflow
+              </a>
+            </div>
+
+            <dl class="mt-10 grid grid-cols-3 gap-4 border-t border-ink/10 pt-7">
+              <div>
+                <dt class="text-2xl font-black">Plan</dt>
+                <dd class="mt-1 text-sm leading-5 text-ink/60">shape the idea</dd>
+              </div>
+              <div>
+                <dt class="text-2xl font-black">Build</dt>
+                <dd class="mt-1 text-sm leading-5 text-ink/60">assemble the edit</dd>
+              </div>
+              <div>
+                <dt class="text-2xl font-black">Ship</dt>
+                <dd class="mt-1 text-sm leading-5 text-ink/60">publish or sell</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="hero-media relative rounded-lg p-3 shadow-soft sm:p-5">
+            <div class="overflow-hidden rounded-lg border border-white/10 bg-black/30 text-white">
+              <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span class="h-3 w-3 rounded-full bg-ember"></span>
+                  <span class="h-3 w-3 rounded-full bg-citrus"></span>
+                  <span class="h-3 w-3 rounded-full bg-mint"></span>
+                </div>
+                <p class="text-xs font-bold uppercase tracking-[.18em] text-white/50">Creator Studio</p>
+              </div>
+
+              <div class="grid gap-4 p-4 sm:grid-cols-[.9fr_1.1fr] sm:p-5">
+                <div class="space-y-4">
+                  <div class="rounded-lg bg-white p-4 text-ink">
+                    <p class="text-xs font-black uppercase tracking-[.18em] text-ember">Brief</p>
+                    <p class="mt-3 text-lg font-black leading-tight">Build a 9:16 launch reel from a product shot</p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                      <span class="rounded-full bg-ink/10 px-3 py-1 text-xs font-bold">Hook script</span>
+                      <span class="rounded-full bg-ink/10 px-3 py-1 text-xs font-bold">Scene list</span>
+                      <span class="rounded-full bg-ink/10 px-3 py-1 text-xs font-bold">Thumbnail set</span>
+                    </div>
+                  </div>
+
+                  <div class="rounded-lg border border-white/10 bg-white/10 p-4">
+                    <div class="flex items-center justify-between">
+                      <p class="text-sm font-bold">Edit checklist</p>
+                      <span class="rounded-full bg-mint px-2.5 py-1 text-xs font-black text-ink">Draft</span>
+                    </div>
+                    <div class="mt-4 space-y-3">
+                      <div class="h-2 rounded-full bg-white/25">
+                        <div class="h-2 w-10/12 rounded-full bg-mint"></div>
+                      </div>
+                      <div class="h-2 rounded-full bg-white/25">
+                        <div class="h-2 w-7/12 rounded-full bg-citrus"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rounded-lg bg-paper p-3 text-ink">
+                  <div class="aspect-[4/5] overflow-hidden rounded-lg bg-[#221f1b] p-3">
+                    <div class="grid h-full grid-rows-[1fr_auto] gap-3">
+                      <div class="rounded-lg bg-[#d84e2f] p-4">
+                        <div class="flex h-full flex-col justify-between rounded-lg bg-black/20 p-4 text-white backdrop-blur-sm">
+                          <p class="w-fit rounded-full bg-white/20 px-3 py-1 text-xs font-black">Template pack</p>
+                          <div>
+                            <p class="text-3xl font-black leading-none">Launch Cut</p>
+                            <p class="mt-2 text-sm text-white/80">Hooks, captions, scene beats, and export presets.</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="grid grid-cols-4 gap-2">
+                        <span class="h-14 rounded-lg bg-white/90"></span>
+                        <span class="h-14 rounded-lg bg-ember"></span>
+                        <span class="h-14 rounded-lg bg-mint"></span>
+                        <span class="h-14 rounded-lg bg-citrus"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-3 rounded-lg bg-ink p-3 text-white">
+                    <div class="timeline-bar h-3 rounded-full"></div>
+                    <div class="mt-3 flex items-center justify-between text-xs font-bold text-white/70">
+                      <span>Hook</span>
+                      <span>Demo</span>
+                      <span>CTA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="border-y border-ink/10 bg-ink py-5 text-bone">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-4 text-center text-sm font-bold text-bone/70 sm:px-6 lg:px-8">
+          <span>Video editors</span>
+          <span>Short-form creators</span>
+          <span>Agencies</span>
+          <span>YouTubers</span>
+          <span>Template sellers</span>
+          <span>Workflow designers</span>
+        </div>
+      </section>
+
+      <section class="bg-paper py-16 sm:py-24">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
+            <div>
+              <p class="text-sm font-black uppercase tracking-[.18em] text-ember">The problem</p>
+              <h2 class="mt-3 text-4xl font-black leading-tight sm:text-5xl">Creation breaks when the workflow is scattered.</h2>
+            </div>
+            <p class="text-lg leading-8 text-ink/70">
+              Creators bounce between asset sites, prompt notes, reference folders, editing timelines, and export tools. PromptEdit is positioned around the job creators actually need done: moving from idea to polished publishable content without losing the thread.
+            </p>
+          </div>
+
+          <div class="mt-10 grid gap-4 md:grid-cols-3">
+            <article class="rounded-lg border border-ink/10 bg-bone p-6">
+              <p class="text-3xl font-black">01</p>
+              <h3 class="mt-6 text-xl font-black">Search eats the edit</h3>
+              <p class="mt-3 leading-7 text-ink/70">Generic marketplaces make creators browse too long before they find assets that fit the channel, format, and deadline.</p>
+            </article>
+            <article class="rounded-lg border border-ink/10 bg-bone p-6">
+              <p class="text-3xl font-black">02</p>
+              <h3 class="mt-6 text-xl font-black">Tools are fragmented</h3>
+              <p class="mt-3 leading-7 text-ink/70">Video, image, prompt, thumbnail, and variation tools often live in separate interfaces with no shared production memory.</p>
+            </article>
+            <article class="rounded-lg border border-ink/10 bg-bone p-6">
+              <p class="text-3xl font-black">03</p>
+              <h3 class="mt-6 text-xl font-black">Assets lack context</h3>
+              <p class="mt-3 leading-7 text-ink/70">A template is more useful when it ships with prompts, scene notes, caption styles, and practical export direction.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="workflow" class="bg-bone py-16 sm:py-24">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="max-w-3xl">
+            <p class="text-sm font-black uppercase tracking-[.18em] text-ember">Workflow</p>
+            <h2 class="mt-3 text-4xl font-black leading-tight sm:text-5xl">A production board for creator tools.</h2>
+            <p class="mt-5 text-lg leading-8 text-ink/70">
+              The concept brings marketplace assets, prompts, references, and video production steps into one UI. Generation tools can support the edit, but the product stays grounded in practical creator work.
+            </p>
+          </div>
+
+          <div class="mt-10 grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
+            <div class="rounded-lg bg-ink p-4 text-bone shadow-soft sm:p-6">
+              <div class="grid gap-4 md:grid-cols-3">
+                <div class="md:col-span-2">
+                  <div class="rounded-lg bg-white p-5 text-ink">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p class="text-sm font-black uppercase tracking-[.16em] text-ember">Scene builder</p>
+                        <h3 class="mt-2 text-2xl font-black">Product demo reel</h3>
+                      </div>
+                      <span class="w-fit rounded-full bg-mint px-3 py-1 text-xs font-black text-ink">9:16 social</span>
+                    </div>
+                    <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                      <div class="rounded-lg bg-bone p-4">
+                        <p class="text-xs font-black text-ink/50">Input</p>
+                        <p class="mt-2 font-bold">Product photo</p>
+                      </div>
+                      <div class="rounded-lg bg-bone p-4">
+                        <p class="text-xs font-black text-ink/50">Direction</p>
+                        <p class="mt-2 font-bold">Motion notes</p>
+                      </div>
+                      <div class="rounded-lg bg-bone p-4">
+                        <p class="text-xs font-black text-ink/50">Output</p>
+                        <p class="mt-2 font-bold">Editable scenes</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 rounded-lg border border-white/10 bg-white/10 p-5">
+                    <div class="flex items-center justify-between gap-3">
+                      <p class="font-black">Review directions</p>
+                      <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-bone/70">3 boards</span>
+                    </div>
+                    <div class="mt-4 grid grid-cols-3 gap-3">
+                      <div class="aspect-[3/4] rounded-lg bg-[#d84e2f]"></div>
+                      <div class="aspect-[3/4] rounded-lg bg-[#2f7f71]"></div>
+                      <div class="aspect-[3/4] rounded-lg bg-[#d9b24c]"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <aside class="rounded-lg bg-white/10 p-5">
+                  <p class="font-black">Production stack</p>
+                  <div class="mt-5 space-y-3">
+                    <div class="rounded-lg bg-white/10 p-4">
+                      <p class="text-sm font-bold">Write the brief</p>
+                      <p class="mt-1 text-sm text-bone/60">Hook, scene, pacing</p>
+                    </div>
+                    <div class="rounded-lg bg-white/10 p-4">
+                      <p class="text-sm font-bold">Create variations</p>
+                      <p class="mt-1 text-sm text-bone/60">Creative directions</p>
+                    </div>
+                    <div class="rounded-lg bg-white/10 p-4">
+                      <p class="text-sm font-bold">Save as pack</p>
+                      <p class="mt-1 text-sm text-bone/60">Reusable workflow</p>
+                    </div>
+                  </div>
+                </aside>
+              </div>
+            </div>
+
+            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
+              <article class="rounded-lg border border-ink/10 bg-paper p-6">
+                <h3 class="text-xl font-black">For creators</h3>
+                <p class="mt-3 leading-7 text-ink/70">Start with a proven template, shape it with prompts and references, then publish with fewer blank-canvas decisions.</p>
+              </article>
+              <article class="rounded-lg border border-ink/10 bg-paper p-6">
+                <h3 class="text-xl font-black">For sellers</h3>
+                <p class="mt-3 leading-7 text-ink/70">Package templates, prompts, presets, and editing guidance into useful products creators can actually ship with.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="marketplace" class="bg-ink py-16 text-bone sm:py-24">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div class="max-w-2xl">
+              <p class="text-sm font-black uppercase tracking-[.18em] text-mint">Marketplace</p>
+              <h2 class="mt-3 text-4xl font-black leading-tight sm:text-5xl">Assets with workflow context.</h2>
+            </div>
+            <p class="max-w-xl text-lg leading-8 text-bone/70">
+              Categories are organized around what creators make, not just what files are called.
+            </p>
+          </div>
+
+          <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <article class="rounded-lg bg-white p-5 text-ink">
+              <div class="flex h-36 flex-col justify-between rounded-lg bg-[#d84e2f] p-4 text-white">
+                <span class="text-xs font-black uppercase tracking-[.16em] text-white/70">Reel kit</span>
+                <span class="text-2xl font-black leading-none">Launch hooks</span>
+              </div>
+              <h3 class="mt-5 text-xl font-black">Video templates</h3>
+              <p class="mt-2 text-sm leading-6 text-ink/70">Hooks, reels, launches, tutorials, and channel packages.</p>
+            </article>
+            <article class="rounded-lg bg-white p-5 text-ink">
+              <div class="flex h-36 flex-col justify-between rounded-lg bg-[#2f7f71] p-4 text-white">
+                <span class="text-xs font-black uppercase tracking-[.16em] text-white/70">Brief pack</span>
+                <span class="text-2xl font-black leading-none">Scene prompts</span>
+              </div>
+              <h3 class="mt-5 text-xl font-black">Prompt systems</h3>
+              <p class="mt-2 text-sm leading-6 text-ink/70">Reusable briefs for image, video, thumbnail, and scene work.</p>
+            </article>
+            <article class="rounded-lg bg-white p-5 text-ink">
+              <div class="flex h-36 flex-col justify-between rounded-lg bg-[#11110f] p-4 text-white">
+                <span class="text-xs font-black uppercase tracking-[.16em] text-white/60">Creator shop</span>
+                <span class="text-2xl font-black leading-none">Channel pack</span>
+              </div>
+              <h3 class="mt-5 text-xl font-black">Creator packs</h3>
+              <p class="mt-2 text-sm leading-6 text-ink/70">Captions, transitions, presets, thumbnails, and production notes.</p>
+            </article>
+            <article class="rounded-lg bg-white p-5 text-ink">
+              <div class="flex h-36 flex-col justify-between rounded-lg bg-[#d9b24c] p-4 text-ink">
+                <span class="text-xs font-black uppercase tracking-[.16em] text-ink/60">Edit bench</span>
+                <span class="text-2xl font-black leading-none">Preset shelf</span>
+              </div>
+              <h3 class="mt-5 text-xl font-black">Editing resources</h3>
+              <p class="mt-2 text-sm leading-6 text-ink/70">Motion graphics, sound cues, LUTs, overlays, and export helpers.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" class="bg-paper py-16 sm:py-24">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="max-w-3xl">
+            <p class="text-sm font-black uppercase tracking-[.18em] text-ember">How it works</p>
+            <h2 class="mt-3 text-4xl font-black leading-tight sm:text-5xl">From idea to publishable faster.</h2>
+          </div>
+
+          <div class="mt-10 grid gap-4 md:grid-cols-3">
+            <article class="rounded-lg border border-ink/10 bg-bone p-7">
+              <span class="grid h-12 w-12 place-items-center rounded-full bg-ink text-lg font-black text-bone">1</span>
+              <h3 class="mt-6 text-2xl font-black">Choose</h3>
+              <p class="mt-3 leading-7 text-ink/70">Pick a template, prompt workflow, or creator pack that matches the content you need to make.</p>
+            </article>
+            <article class="rounded-lg border border-ink/10 bg-bone p-7">
+              <span class="grid h-12 w-12 place-items-center rounded-full bg-ember text-lg font-black text-white">2</span>
+              <h3 class="mt-6 text-2xl font-black">Customize</h3>
+              <p class="mt-3 leading-7 text-ink/70">Adapt scenes, prompts, captions, pacing, and formats for your channel, brand, or client.</p>
+            </article>
+            <article class="rounded-lg border border-ink/10 bg-bone p-7">
+              <span class="grid h-12 w-12 place-items-center rounded-full bg-mint text-lg font-black text-ink">3</span>
+              <h3 class="mt-6 text-2xl font-black">Create</h3>
+              <p class="mt-3 leading-7 text-ink/70">Export, publish, continue editing, or package your workflow for other creators to buy.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="outcomes" class="bg-bone py-16 sm:py-24">
+        <div class="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[.9fr_1.1fr] lg:px-8">
+          <div>
+            <p class="text-sm font-black uppercase tracking-[.18em] text-ember">Creator outcomes</p>
+            <h2 class="mt-3 text-4xl font-black leading-tight sm:text-5xl">Less setup. Better output. More finished work.</h2>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <article class="rounded-lg bg-paper p-6 shadow-sm">
+              <h3 class="text-xl font-black">Move faster</h3>
+              <p class="mt-3 leading-7 text-ink/70">Start from proven structures instead of rebuilding the same creative setup for every video.</p>
+            </article>
+            <article class="rounded-lg bg-paper p-6 shadow-sm">
+              <h3 class="text-xl font-black">Sell smarter</h3>
+              <p class="mt-3 leading-7 text-ink/70">Creators can turn working systems into marketplace products with clearer value.</p>
+            </article>
+            <article class="rounded-lg bg-paper p-6 shadow-sm">
+              <h3 class="text-xl font-black">Stay focused</h3>
+              <p class="mt-3 leading-7 text-ink/70">Keep prompts, assets, variations, and editing notes connected in one production flow.</p>
+            </article>
+            <article class="rounded-lg bg-paper p-6 shadow-sm">
+              <h3 class="text-xl font-black">Ship consistently</h3>
+              <p class="mt-3 leading-7 text-ink/70">Build repeatable content systems for launches, ads, tutorials, shorts, and client work.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="join" class="bg-ember px-4 py-16 text-white sm:px-6 sm:py-20 lg:px-8">
+        <div class="mx-auto max-w-5xl text-center">
+          <h2 class="text-4xl font-black leading-tight sm:text-6xl">Join the marketplace built for serious creators.</h2>
+          <p class="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/80">
+            Discover creator-ready assets, build practical workflows, and package your own templates for modern video production.
+          </p>
+          <div class="mt-8 flex justify-center">
+            <a
+              href="mailto:hello@contentcreator.com?subject=Join%20the%20PromptEdit%20marketplace"
+              class="focus-ring inline-flex min-h-12 items-center justify-center rounded-full bg-white px-7 text-base font-black text-ink transition hover:bg-ink hover:text-white"
+            >
+              Join the marketplace
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-ink py-10 text-bone">
+      <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+        <div>
+          <p class="text-lg font-black">PromptEdit</p>
+          <p class="mt-2 text-sm text-bone/60">A design-focused landing page concept for ContentCreator.com.</p>
+        </div>
+        <div class="flex flex-wrap gap-5 text-sm font-bold text-bone/70">
+          <a class="focus-ring rounded-sm hover:text-bone" href="#workflow">Workflow</a>
+          <a class="focus-ring rounded-sm hover:text-bone" href="#marketplace">Marketplace</a>
+          <a class="focus-ring rounded-sm hover:text-bone" href="#join">Join</a>
+        </div>
+      </div>
+    </footer>
+    <script>
+      const introModal = document.querySelector("#intro-modal");
+      const closeModalControls = document.querySelectorAll("[data-close-modal]");
+
+      function closeIntroModal() {
+        introModal.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+      }
+
+      document.body.classList.add("overflow-hidden");
+      closeModalControls.forEach((control) => {
+        control.addEventListener("click", closeIntroModal);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !introModal.classList.contains("hidden")) {
+          closeIntroModal();
+        }
+      });
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (!reduceMotion) {
+        document.body.classList.add("motion-ready");
+
+        const revealGroups = [
+          ...document.querySelectorAll("main section > div"),
+          ...document.querySelectorAll("footer > div")
+        ];
+        const revealItems = [
+          ...document.querySelectorAll("article"),
+          ...document.querySelectorAll("dl > div"),
+          ...document.querySelectorAll("#marketplace article > div")
+        ];
+
+        revealGroups.forEach((group) => group.classList.add("reveal"));
+        revealItems.forEach((item, index) => {
+          item.classList.add("reveal");
+          item.style.setProperty("--stagger-delay", `${Math.min(index % 4, 3) * 70}ms`);
+        });
+
+        document.querySelectorAll(".grid").forEach((grid) => {
+          if (grid.querySelector(".reveal")) {
+            grid.classList.add("reveal-stagger");
+          }
+        });
+
+        if ("IntersectionObserver" in window) {
+          const revealObserver = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("is-visible");
+                  revealObserver.unobserve(entry.target);
+                }
+              });
+            },
+            { rootMargin: "0px 0px -12% 0px", threshold: 0.12 }
+          );
+
+          document.querySelectorAll(".reveal").forEach((element) => {
+            revealObserver.observe(element);
+          });
+        } else {
+          document.querySelectorAll(".reveal").forEach((element) => {
+            element.classList.add("is-visible");
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
