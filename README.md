@@ -27,13 +27,7 @@ The visual system uses high-contrast editorial spacing, warm creator-focused acc
 
 ## Run Locally
 
-Open `index.html` directly in a browser, or run:
-
-```bash
-python3 -m http.server 4173
-```
-
-Then visit `http://localhost:4173`.
+Open `index.html` directly in a browser.
 
 ## Assumptions
 
