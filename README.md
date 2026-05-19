@@ -1,6 +1,6 @@
 # PromptEdit Landing Page
 
-A static sales page concept for PromptEdit / ContentCreator.com, built from the guidance in `Agents.md`.
+A static sales page concept for PromptEdit / ContentCreator.com.
 
 ## What This Builds
 
